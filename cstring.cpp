@@ -17,11 +17,11 @@ int Strcmp(const char* first, const char* second) {
   while (*first && *second) {
 
     if (*first > *(second)) {
-      return 1;
+      break;
     }
 
     if (*first < *second) {
-      return -1;
+      break;
     }
     ++first;
     ++second;
@@ -35,11 +35,11 @@ int Strncmp(const char* first, const char* second, size_t count) {
 
   while (size < count && *first && *second) {
     if (*first > *second) {
-      return 1;
+      break;
     }
 
     if (*first < *second) {
-      return -1;
+      break;
     }
 
     ++first;
@@ -47,40 +47,32 @@ int Strncmp(const char* first, const char* second, size_t count) {
     ++size;
   }
 
-  if (size == count) {
-    return 0;
-  }
-  if (*first && !*second) {
-    return 1;
-  }
-  if (!*first && *second) {
-    return -1;
-  }
-
-  return 0;
+  return *first - *second;
 }
 
 char* Strcpy(char* dest, const char* src) {
-  char* helper = dest;
+  int count = 0;
 
   while (*src != '\0') {
     *dest = *src;
     ++dest;
     ++src;
+    ++count;
   }
 
   *dest = '\0';
 
-  return helper;
+  return dest - count;
 }
 
 char* Strncpy(char* dest, const char* src, size_t count) {
-  char* helper = dest;
+  int index;
   size_t size = 0;
 
   while (*src && size < count) {
     *dest = *src;
     ++dest;
+    ++index;
     ++src;
     ++size;
   }
@@ -90,11 +82,12 @@ char* Strncpy(char* dest, const char* src, size_t count) {
     while (size < count) {
       *dest = '\0';
       ++dest;
+      ++index;
       ++size;
     }
   }
 
-  return helper;
+  return dest - index;
 }
 
 char* Strcat(char* dest, const char* src) {
@@ -135,21 +128,19 @@ const char* Strrchr(const char* str, char symbol) {
   int answer = -1;
 
   while (str[count] != '\0') {
+
     if (*(str + count) == symbol) {
       answer = count;
     }
+
     ++count;
   }
 
   if (str[count] == symbol) {
-    return str + count;
+    answer = count;
   }
 
-  if (answer != -1) {
-    return str + answer;
-  }
-
-  return nullptr;
+  return (answer == -1 ? nullptr : str + answer);
 }
 
 size_t Strspn(const char* dest, const char* src) {
@@ -183,20 +174,25 @@ size_t Strcspn(const char* dest, const char* src) {
 }
 
 const char* Strpbrk(const char* dest, const char* breakset) {
+  bool flag = false;
+
   while (*dest) {
     if (Strchr(breakset, *dest) != nullptr) {
-      return dest;
+      flag = true;
+      break;
     }
     ++dest;
   }
 
-  return nullptr;
+  return (flag ? dest :nullptr);
 }
 
 const char* Strstr(const char* str, const char* pattern) {
   if (*pattern == '\0') {
     return str;
   }
+
+  bool flag = false;
 
   while (*str != '\0') {
     const char* pattern_helper = pattern;
@@ -208,11 +204,12 @@ const char* Strstr(const char* str, const char* pattern) {
     }
 
     if (*pattern_helper == '\0') {
-      return str;
+      flag= true;
+      break;
     }
 
     ++str;
   }
 
-  return nullptr;
+  return flag ? str : nullptr;
 }
